@@ -15,9 +15,7 @@ class DealerResource extends Resource
 {
     protected static ?string $model = Dealer::class;
 
-    // Иконка в боковом меню
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
-    
     protected static ?string $navigationLabel = 'Автосалоны';
     protected static ?string $modelLabel = 'Автосалон';
     protected static ?string $pluralModelLabel = 'Автосалоны';
@@ -34,23 +32,18 @@ class DealerResource extends Resource
                             ->required()
                             ->maxLength(40)
                             ->live(onBlur: true)
-                            // Автоматически создаем slug из названия при создании
                             ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
                                 $operation === 'create' ? $set('slug', Str::slug($state)) : null),
 
                         Forms\Components\TextInput::make('slug')
-                            ->label('URL (Slug)')
+                            ->label('Slug')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(40),
 
-                        Forms\Components\TextInput::make('city')
+                        Forms\Components\Select::make('city_id')
                             ->label('Город')
-                            ->maxLength(40),
-
-                        Forms\Components\Select::make('user_id')
-                            ->label('Владелец (Пользователь)')
-                            ->relationship('user', 'name')
+                            ->relationship('city', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -68,7 +61,7 @@ class DealerResource extends Resource
                             ->content(fn (?Dealer $record): string => $record ? $record->updated_at->diffForHumans() : '-'),
                     ])
                     ->columns(2)
-                    ->hidden(fn (?Dealer $record) => $record === null), // Скрываем при создании
+                    ->hidden(fn (?Dealer $record) => $record === null),
             ]);
     }
 
@@ -85,19 +78,9 @@ class DealerResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('slug')
-                    ->label('Slug')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('city')
+                Tables\Columns\TextColumn::make('city.name')
                     ->label('Город')
                     ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Владелец')
-                    ->badge()
-                    ->color('gray')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -107,12 +90,9 @@ class DealerResource extends Resource
                     ->toggleable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('city')
-                    ->label('Фильтр по городу'),
-                
-                Tables\Filters\SelectFilter::make('user_id')
-                    ->label('По владельцу')
-                    ->relationship('user', 'name'),
+                Tables\Filters\SelectFilter::make('city_id')
+                    ->label('Фильтр по городу')
+                    ->relationship('city', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -127,9 +107,7 @@ class DealerResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

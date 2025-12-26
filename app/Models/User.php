@@ -6,9 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasRoles; // Добавьте эту строку
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -45,9 +47,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-     public function dealer(){
-    return $this->hasMany(Dealer::class, 'user_id', 'id');
-  }
 
 }

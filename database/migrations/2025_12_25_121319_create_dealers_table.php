@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('title', '40');
             $table->string('slug', '40');
-            $table->string('city', '40')->nullable();
-            $table->foreignId('user_id')
-            ->index()
-            ->constrained('users')
-            ->cascadeOnUpdate()
-            ->restrictOnDelete();
+            $table->foreignId('city_id')
+                ->index()
+                ->constrained('cities') // Указывает, что поле ссылается на таблицу cities
+                ->cascadeOnUpdate()
+                ->restrictOnDelete(); // Не даст удалить город, если к нему привязаны дилеры
             $table->timestamps();
         });
     }

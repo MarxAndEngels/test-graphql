@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SiteResource extends Resource
 {
@@ -17,81 +18,167 @@ class SiteResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
     protected static ?string $navigationLabel = 'Сайты';
     protected static ?string $pluralModelLabel = 'Сайты';
+    protected static ?string $modelLabel = 'Сайт';
 
-public static function form(Form $form): Form
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Параметры сайта')
+                Forms\Components\Grid::make(3)
                     ->schema([
-                        // Загрузка фавикона
-                        Forms\Components\FileUpload::make('favicon_image')
-                            ->label('Favicon (иконка)')
-                            ->image()
-                            ->directory('sites/favicons')
-                            ->imageEditor(),
+                        // Основная колонка (слева)
+                        Forms\Components\Group::make()
+                            ->schema([
+                                Forms\Components\Section::make('Параметры сайта')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('url')
+                                            ->label('URL сайта')
+                                            ->required()
+                                            ->url()
+                                            ->placeholder('https://example.com')
+                                            ->unique(ignoreRecord: true),
 
-                        // Выбор дилера
-                        Forms\Components\Select::make('dealer_id')
-                            ->label('Дилер')
-                            ->relationship('dealer', 'title')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
+                                        Forms\Components\Select::make('dealer_id')
+                                            ->label('Дилер')
+                                            ->relationship('dealer', 'title')
+                                            ->searchable()
+                                            ->preload()
+                                            ->required(),
+                                    ]),
 
-                        // Выбор владельца
-                        Forms\Components\Select::make('user_id')
-                            ->label('Владелец')
-                            ->relationship('user', 'name')
-                            ->default(auth()->id())
-                            ->searchable()
-                            ->required(),
+                                Forms\Components\Section::make('Связанные фиды')
+                                    ->schema([
+                                        Forms\Components\Select::make('feeds')
+                                            ->label('Фиды для этого сайта')
+                                            ->relationship('feeds', 'name')
+                                            ->multiple()
+                                            ->preload()
+                                            ->searchable(),
+                                    ]),
+
+                                Forms\Components\Section::make('Иерархия (Зеркала)')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('is_main')
+                                            ->label('Это главный сайт')
+                                            ->helperText('Отметьте, если сайт является основным')
+                                            ->default(false)
+                                            ->live(),
+
+                                        Forms\Components\Select::make('parent_id')
+                                            ->label('Главный сайт (родитель)')
+                                            ->relationship(
+                                                'parent', 
+                                                'url',
+                                                fn (Builder $query) => $query->where('is_main', true)
+                                            )
+                                            ->searchable()
+                                            ->placeholder('Выберите основной сайт')
+                                            ->hidden(fn (Forms\Get $get) => $get('is_main'))
+                                            ->required(fn (Forms\Get $get) => !$get('is_main')),
+                                    ]),
+                            ])
+                            ->columnSpan(2),
+
+                        // Боковая колонка (справа)
+                        Forms\Components\Group::make()
+                            ->schema([
+                                Forms\Components\Section::make('Статус и Визуал')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('is_active')
+                                            ->label('Активен')
+                                            ->default(true)
+                                            ->onColor('success')
+                                            ->offColor('danger'),
+
+                                        Forms\Components\FileUpload::make('favicon_image')
+                                            ->label('Favicon')
+                                            ->image()
+                                            ->directory('sites/favicons')
+                                            ->imageEditor()
+                                            ->avatar() 
+                                    ]),
+
+                                Forms\Components\Section::make('Инфо')
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('created_at')
+                                            ->label('Создан')
+                                            ->content(fn (?Site $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+                                        
+                                        Forms\Components\Placeholder::make('updated_at')
+                                            ->label('Изменен')
+                                            ->content(fn (?Site $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                                    ])
+                                    ->hidden(fn (?Site $record) => $record === null),
+                            ])
+                            ->columnSpan(1),
                     ]),
-
-                Forms\Components\Section::make('Системная информация')
-    ->schema([
-        Forms\Components\Placeholder::make('created_at')
-            ->label('Дата создания')
-            ->content(fn (?Site $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-        Forms\Components\Placeholder::make('updated_at')
-            ->label('Последнее изменение')
-            ->content(fn (?Site $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
-    ])
-    ->columns(2)
-    ->hidden(fn (?Site $record) => $record === null),
             ]);
     }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('favicon_image')
-                    ->label('Иконка')
+                    ->label('')
                     ->circular(),
+
+                Tables\Columns\TextColumn::make('url')
+                    ->label('URL')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->color(fn (Site $record): string => $record->is_main ? 'warning' : 'primary')
+                    ->weight(fn (Site $record): string => $record->is_main ? 'bold' : 'normal'),
+
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Активен'),
+
+                // Исправлено: замена IconColumn на TextColumn с Badge для избежания ошибки
+                Tables\Columns\TextColumn::make('is_main')
+                    ->label('Тип')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Главный' : 'Зеркало')
+                    ->badge()
+                    ->color(fn (bool $state): string => $state ? 'warning' : 'gray'),
+
+                Tables\Columns\TextColumn::make('parent.url')
+                    ->label('Оригинал')
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('dealer.title')
                     ->label('Дилер')
-                    ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Владелец')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('feeds.name')
+                    ->label('Фиды')
+                    ->badge()
+                    ->color('info')
+                    ->listWithLineBreaks()
+                    ->limitList(2)
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Создан')
-                    ->dateTime('d.m.Y H:i') // Формат даты
-                    ->placeholder('Не указано') // Что показать, если в базе NULL
-                    ->sortable(),
+                    ->label('Дата')
+                    ->dateTime('d.m.Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('is_main', 'desc') // Сначала главные сайты
             ->filters([
+                Tables\Filters\TernaryFilter::make('is_active')->label('Активные'),
+                Tables\Filters\TernaryFilter::make('is_main')->label('Главные'),
                 Tables\Filters\SelectFilter::make('dealer')
-                    ->relationship('dealer', 'title')
+                    ->relationship('dealer', 'title'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

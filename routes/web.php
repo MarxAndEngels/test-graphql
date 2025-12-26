@@ -16,7 +16,6 @@ Route::get('/quick-start', function () {
             'password' => Hash::make('12345678'), // пароль будет: password
         ]
     );
-
     return "Пользователь (admin@test.com) и Дилер созданы! Теперь можно идти в /admin";
 });
 

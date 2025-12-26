@@ -12,9 +12,10 @@ class Dealer extends Model
    protected $guarded = false;
    public $timestamps = true;
 
-   public function user(){
-    return $this->belongsTo(User::class);
-  }
+public function city()
+{
+    return $this->belongsTo(City::class);
+}
   public function sites(): \Illuminate\Database\Eloquent\Relations\HasMany
 {
     return $this->hasMany(Site::class);
