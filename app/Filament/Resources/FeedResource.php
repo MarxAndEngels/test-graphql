@@ -90,13 +90,13 @@ class FeedResource extends Resource
                     ->copyable()
                     ->color('gray'),
 
-                // Колонка со счетчиком сайтов
-                Tables\Columns\TextColumn::make('sites_count')
-                    ->label('На сайтах')
-                    ->counts('sites')
-                    ->badge()
-                    ->color('success')
-                    ->sortable(),
+                // // Колонка со счетчиком сайтов
+                // Tables\Columns\TextColumn::make('sites_count')
+                //     ->label('На сайтах')
+                //     ->counts('sites')
+                //     ->badge()
+                //     ->color('success')
+                //     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
@@ -127,4 +127,22 @@ class FeedResource extends Resource
             'edit' => Pages\EditFeed::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{
+    // Разрешаем только root и admin
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canEdit($record): bool
+{
+    // Менеджер не может редактировать
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canDelete($record): bool
+{
+    // Удаление только для root
+    return auth()->user()->hasRole('root');
+}
 }

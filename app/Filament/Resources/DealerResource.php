@@ -118,4 +118,22 @@ class DealerResource extends Resource
             'edit' => Pages\EditDealer::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{
+    // Разрешаем только root и admin
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canEdit($record): bool
+{
+    // Менеджер не может редактировать
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canDelete($record): bool
+{
+    // Удаление только для root
+    return auth()->user()->hasRole('root');
+}
 }

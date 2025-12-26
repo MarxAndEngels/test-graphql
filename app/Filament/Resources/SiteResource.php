@@ -132,7 +132,8 @@ class SiteResource extends Resource
                     ->weight(fn (Site $record): string => $record->is_main ? 'bold' : 'normal'),
 
                 Tables\Columns\ToggleColumn::make('is_active')
-                    ->label('Активен'),
+                    ->label('Активен')
+                    ->disabled(fn () => !auth()->user()->hasAnyRole(['admin', 'root'])),
 
                 // Исправлено: замена IconColumn на TextColumn с Badge для избежания ошибки
                 Tables\Columns\TextColumn::make('is_main')
@@ -190,4 +191,22 @@ class SiteResource extends Resource
             'edit' => Pages\EditSite::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+{
+    // Разрешаем только root и admin
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canEdit($record): bool
+{
+    // Менеджер не может редактировать
+    return auth()->user()->hasAnyRole(['root', 'admin']);
+}
+
+public static function canDelete($record): bool
+{
+    // Удаление только для root
+    return auth()->user()->hasRole('root');
+}
 }
