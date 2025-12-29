@@ -39,7 +39,7 @@ class UsersQuery extends Query
         if (isset($args['id'])) {
             return User::where('id', $args['id'])->get();
         }
-        // Здесь мы просто берем всех пользователей из БД через Eloquent
+        // Здесь мы просто берем всех пользователей 
         return User::all();
     }
 }

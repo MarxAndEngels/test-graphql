@@ -10,6 +10,7 @@
         "filament/filament": "^3.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "mll-lab/laravel-graphiql": "^4.0",
         "rebing/graphql-laravel": "^9.14",
         "spatie/laravel-permission": "^6.24"
     },

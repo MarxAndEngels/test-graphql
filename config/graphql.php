@@ -76,10 +76,13 @@ return [
         'default' => [
             'query' => [
                 'users' => \App\GraphQL\Queries\UsersQuery::class,
+                'cities' => \App\GraphQL\Queries\CitiesQuery::class,
+                'sites' => \App\GraphQL\Queries\SitesQuery::class,
+                'dealers' => \App\GraphQL\Queries\DealersQuery::class, 
                 // ExampleQuery::class,
             ],
             'mutation' => [
-                // ExampleMutation::class,
+                'createCity' => \App\GraphQL\Mutations\CreateCityMutation::class, // Добавили мутацию
             ],
             // The types only available in this schema
             'types' => [
@@ -115,6 +118,9 @@ return [
     //
     'types' => [
         'User' => \App\GraphQL\Types\UserType::class,
+        'City' => \App\GraphQL\Types\CityType::class, 
+        'Dealer' => \App\GraphQL\Types\DealerType::class, 
+        'Site' => \App\GraphQL\Types\SiteType::class,
         // ExampleType::class,
         // ExampleRelationType::class,
         // \Rebing\GraphQL\Support\UploadType::class,
