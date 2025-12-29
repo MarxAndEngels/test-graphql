@@ -10,6 +10,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: [
+        'graphql', // Разрешает внешние POST-запросы к GraphQL
+    ]);
+})
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
