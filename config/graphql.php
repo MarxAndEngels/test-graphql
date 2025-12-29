@@ -77,6 +77,7 @@ return [
             'query' => [
                 'users' => \App\GraphQL\Queries\UsersQuery::class,
                 'cities' => \App\GraphQL\Queries\CitiesQuery::class,
+                'feeds' => App\GraphQL\Queries\FeedsQuery::class,
                 'sites' => \App\GraphQL\Queries\SitesQuery::class,
                 'dealers' => \App\GraphQL\Queries\DealersQuery::class, 
                 'siteFeeds' => App\GraphQL\Queries\SiteFeedsQuery::class,
