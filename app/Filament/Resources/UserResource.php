@@ -152,6 +152,7 @@ class UserResource extends Resource
                     ->label('Фильтр по ролям')
                     ->relationship('roles', 'name'),
             ])
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

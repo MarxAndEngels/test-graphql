@@ -108,6 +108,7 @@ class FeedResource extends Resource
                         'Google XML' => 'Google XML',
                     ]),
             ])
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

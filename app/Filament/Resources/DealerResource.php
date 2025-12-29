@@ -89,6 +89,7 @@ class DealerResource extends Resource
                     ->sortable()
                     ->toggleable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('city_id')
                     ->label('Фильтр по городу')

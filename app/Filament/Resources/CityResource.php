@@ -15,7 +15,7 @@ class CityResource extends Resource
 {
     protected static ?string $model = City::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map-pin'; // Иконка в меню
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?string $navigationLabel = 'Города';
     protected static ?string $modelLabel = 'Город';
     protected static ?string $pluralModelLabel = 'Города';
@@ -63,6 +63,7 @@ class CityResource extends Resource
             ->filters([
                 //
             ])
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -77,7 +78,7 @@ class CityResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Здесь можно будет добавить список дилеров этого города
+           
         ];
     }
 

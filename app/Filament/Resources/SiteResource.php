@@ -140,7 +140,7 @@ class SiteResource extends Resource
                     ->label('Активен')
                     ->disabled(fn () => !auth()->user()->hasAnyRole(['admin', 'root'])),
 
-                // Исправлено: замена IconColumn на TextColumn с Badge для избежания ошибки
+
                 Tables\Columns\TextColumn::make('is_main')
                     ->label('Тип')
                     ->formatStateUsing(fn (bool $state): string => $state ? 'Главный' : 'Зеркало')
@@ -170,7 +170,7 @@ class SiteResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('is_main', 'desc') // Сначала главные сайты
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('Активные'),
                 Tables\Filters\TernaryFilter::make('is_main')->label('Главные'),
