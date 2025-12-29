@@ -79,6 +79,7 @@ return [
                 'cities' => \App\GraphQL\Queries\CitiesQuery::class,
                 'sites' => \App\GraphQL\Queries\SitesQuery::class,
                 'dealers' => \App\GraphQL\Queries\DealersQuery::class, 
+                'siteFeeds' => App\GraphQL\Queries\SiteFeedsQuery::class,
                 // ExampleQuery::class,
             ],
             'mutation' => [
@@ -121,6 +122,8 @@ return [
         'City' => \App\GraphQL\Types\CityType::class, 
         'Dealer' => \App\GraphQL\Types\DealerType::class, 
         'Site' => \App\GraphQL\Types\SiteType::class,
+        'Feed' => App\GraphQL\Types\FeedType::class,
+        'SiteFeed' => App\GraphQL\Types\SiteFeedType::class,
         // ExampleType::class,
         // ExampleRelationType::class,
         // \Rebing\GraphQL\Support\UploadType::class,
