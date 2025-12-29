@@ -95,7 +95,12 @@ class SiteResource extends Resource
                                             ->image()
                                             ->directory('sites/favicons')
                                             ->imageEditor()
-                                            ->avatar() 
+                                            ->avatar()
+                                            ->acceptedFileTypes(['image/x-icon', 'image/png', 'image/jpeg', 'image/svg+xml']) // Разрешенные типы
+                                            ->maxSize(50024)
+                                            ->validationMessages([
+                                                'max' => 'Файл слишком большой',
+                                            ]),
                                     ]),
 
                                 Forms\Components\Section::make('Инфо')
